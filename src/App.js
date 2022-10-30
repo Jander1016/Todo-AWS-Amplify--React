@@ -25,6 +25,12 @@ function App({ signOut, user }) {
     setData({ ...data, [e.target.id]: e.target.value });
   };
 
+	const loadtasks = async () => {
+    const result = await API.graphql(graphqlOperation(listTodos));
+    const listData = await result.data.listTodos.items;
+    setTasks(listData);
+  };
+
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -34,28 +40,24 @@ function App({ signOut, user }) {
       setTodos([...todos, todo]);
       setData({ name: "", description: "" });
       await API.graphql(graphqlOperation(createTodo, { input: todo }));
-      console.log(tasks);
+      loadtasks()
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  const loadtasks = async () => {
-    const result = await API.graphql(graphqlOperation(listTodos));
-    const listData = await result.data.listTodos.items;
-    setTasks(listData);
-  };
+  
 
   useEffect(() => {
     loadtasks();
   }, []);
 
   return (
-    <div className="container ">
+    <div className="container" >
       <div className="row">
-        <div className="col-md4 offset-md-4">
-				<Heading level={1}>Hello {user.username}</Heading>
+			<Heading level={1}>Hello {user.username}</Heading>
         <Button onClick={signOut}>Sign out</Button>
+        {/* <div className="col-md1 offset-md-4"> */}
           <Form onSubmit={(e) => handleSubmit(e)}>
             <Form.Group className="mb-3" controlId="name">
               <Form.Label>Name Task</Form.Label>
@@ -71,7 +73,7 @@ function App({ signOut, user }) {
             <Form.Group className="mb-3" controlId="description">
               <Form.Label>Description Task</Form.Label>
               <Form.Control
-                type="text"
+                as="textarea"
                 autoComplete="off"
                 id="description"
                 value={data.description}
@@ -89,7 +91,7 @@ function App({ signOut, user }) {
               : null}
           </Form>
         </div>
-      </div>
+      {/* </div> */}
     </div>
   );
 }
